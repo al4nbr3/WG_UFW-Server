@@ -8,8 +8,8 @@ REMOTE_PATH="/opt/WG_UFW-Server"
 
 echo "==> Deploying WG_UFW-Server to ${REMOTE_USER}@${REMOTE_HOST}:${REMOTE_PATH}"
 
-# Create destination directory on remote
-ssh "${REMOTE_USER}@${REMOTE_HOST}" "sudo mkdir -p ${REMOTE_PATH} && sudo chown ${REMOTE_USER}:${REMOTE_USER} ${REMOTE_PATH}"
+# Create destination directory on remote (uses -t for sudo TTY)
+ssh -t "${REMOTE_USER}@${REMOTE_HOST}" "sudo mkdir -p ${REMOTE_PATH} && sudo chown ${REMOTE_USER}:${REMOTE_USER} ${REMOTE_PATH}"
 
 # Sync project files (exclude secrets, caches, git history)
 rsync -avz --progress \
