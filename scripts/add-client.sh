@@ -22,7 +22,10 @@ PSK=$(python3 -c "import json; d=json.load(open('$RECORD')); print(d.get('presha
 echo "==> Adding peer '$NAME' (IP: $IP) to wg0..."
 
 if [[ -n "$PSK" ]]; then
-    sudo wg set wg0 peer "$PUBLIC_KEY" preshared-key <(echo "$PSK") allowed-ips "${IP}/32"
+    TMPFILE=$(mktemp)
+    echo "$PSK" > "$TMPFILE"
+    sudo wg set wg0 peer "$PUBLIC_KEY" preshared-key "$TMPFILE" allowed-ips "${IP}/32"
+    rm -f "$TMPFILE"
 else
     sudo wg set wg0 peer "$PUBLIC_KEY" allowed-ips "${IP}/32"
 fi
