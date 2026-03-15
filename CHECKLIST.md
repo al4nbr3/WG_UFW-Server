@@ -22,11 +22,33 @@
 - [x] `scripts/stop-wg.sh` — Stop WireGuard
 - [x] `scripts/status.sh` — Show WireGuard + UFW status
 - [x] `scripts/backup.sh` — Backup config
+- [x] `scripts/deploy.sh` — Deploy project to remote via rsync/SSH
+- [x] `scripts/cleanup-server.sh` — Remove non-essential services/packages
 - [x] `config/wg0.conf.template` — WireGuard config template
 - [x] `docs/SETUP.md` — Full setup and usage documentation
 - [x] GitHub repo created and pushed (`al4nbr3/WG_UFW-Server`)
 
+## Session: 2026-03-15 — Remote Deployment & First Client
+
+### Completed
+- [x] SSH enabled on remote server `192.168.1.195` (user: `observa`, hostname: `V10L3T4`)
+- [x] Remote specs confirmed: 15 GB RAM, 234 GB NVMe, 8-core Intel i7-7700T
+- [x] `scripts/cleanup-server.sh` ran — removed logstash, suricata, snort, samba, cups, bluetooth, browsers, VirtualBox
+- [x] `scripts/deploy.sh` fixed — added `ssh -t` flag for sudo TTY
+- [x] `scripts/add-client.sh` fixed — replaced process substitution with tmpfile for preshared key
+- [x] Remote deployed to `/opt/WG_UFW-Server`
+- [x] WireGuard installed and running on `enp0s31f6` interface, IP `10.0.0.1/24`
+- [x] UFW configured — port `51820/udp` open, SSH preserved
+- [x] `wg-quick@wg0` enabled on boot
+- [x] Client `p0rk3y` (Windows PC) created — IP `10.0.0.2/32`
+- [x] `.env` configured on remote with `ANTHROPIC_API_KEY`
+- [x] Python dependencies installed on remote
+
+### In Progress
+- [ ] Transfer `p0rk3y.conf` to Windows machine and import into WireGuard app
+
 ### Pending
+- [ ] Verify WireGuard tunnel works from p0rk3y (Windows) to server
 - [ ] Add client QR code generation for mobile devices
 - [ ] Add DNS leak test script
 - [ ] Add monitoring/status web dashboard

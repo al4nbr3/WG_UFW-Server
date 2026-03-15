@@ -2,6 +2,21 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Project Overview
+
+WG_UFW-Server manages a WireGuard VPN + UFW firewall on Ubuntu 24.04. The server is deployed at:
+- **Remote server:** `192.168.1.195` (hostname: `V10L3T4`, user: `observa`)
+- **Deployed path:** `/opt/WG_UFW-Server`
+- **WireGuard interface:** `wg0` on `enp0s31f6`, server IP `10.0.0.1/24`
+- **WireGuard port:** `51820/udp`
+- **GitHub repo:** `https://github.com/al4nbr3/WG_UFW-Server`
+
+## Registered Clients
+
+| Name | IP | Device |
+|------|----|--------|
+| p0rk3y | 10.0.0.2/32 | Windows PC |
+
 ## Commands
 
 ```bash
@@ -14,12 +29,19 @@ python wg_ufw_manager.py
 # Run status check
 python wg_ufw_manager.py --status
 
+# List clients
+python wg_ufw_manager.py --list-clients
+
+# Add a client
+python wg_ufw_manager.py --add-client <name>
+
 # Run with AI assistant mode
 python wg_ufw_manager.py --ai
 ```
 
 ### Deployment scripts (never run sudo manually — use these scripts)
 ```bash
+bash scripts/deploy.sh               # Deploy from local machine to 192.168.1.195
 bash scripts/install.sh              # Install WireGuard + UFW on Ubuntu 24.04
 bash scripts/configure-server.sh     # Generate keys + create wg0.conf
 bash scripts/add-client.sh <name>    # Add a new peer/client
@@ -29,11 +51,10 @@ bash scripts/start-wg.sh             # Start WireGuard interface
 bash scripts/stop-wg.sh              # Stop WireGuard interface
 bash scripts/status.sh               # Show WireGuard + UFW status
 bash scripts/backup.sh               # Backup WireGuard config
+bash scripts/cleanup-server.sh       # Remove non-essential services/packages
 ```
 
 ## Architecture
-
-WG_UFW-Server is a WireGuard VPN + UFW firewall management tool for Ubuntu 24.04 with an optional Claude AI assistant interface.
 
 ```
 wg_ufw_manager.py (CLI entry point)
@@ -59,3 +80,12 @@ wg_ufw_manager.py (CLI entry point)
 
 - `ANTHROPIC_API_KEY` — Claude AI assistant features (optional; falls back to manual mode if not set)
 - Loaded from `.env` file at project root (never committed to git)
+- `.env` is configured on the remote server at `/opt/WG_UFW-Server/.env`
+
+## Resuming Work
+
+To continue working on this project in a new session:
+1. Open Claude Code from any machine
+2. `cd /mnt/jbaez_data/Scripts-linux/WG_UFW-Server`
+3. Read `CHECKLIST.md` to see current state and pending tasks
+4. SSH into remote: `ssh observa@192.168.1.195`
