@@ -1,0 +1,26 @@
+# Secrets — never commit
+.env
+*.key
+*.pem
+*.p12
+private/
+
+# WireGuard generated configs with keys
+config/wg0.conf
+config/clients/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+*.egg-info/
+
+# Backups
+backups/
+*.bak
+
+# OS
+.DS_Store
+Thumbs.db
