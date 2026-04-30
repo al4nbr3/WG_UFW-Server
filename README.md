@@ -12,6 +12,35 @@ WireGuard VPN + UFW Firewall manager for Ubuntu 24.04 with an optional Claude AI
 - Backup and cleanup scripts
 - Optional Claude AI assistant for help and diagnostics
 
+## Architecture
+
+```
+ WG client (10.0.0.x)                   Gateway (.195, V10L3T4)
+ ┌─────────────────┐                    ┌──────────────────────────────────┐
+ │ WireGuard peer  │   UDP/443 (encrypted)   UFW input: ALLOW 443/udp     │
+ │ AllowedIPs      │ ──────────────────▶│  wg-quick@wg0 ── wg0 (10.0.0.1) │
+ │   = 0.0.0.0/0   │                    │       │                          │
+ └─────────────────┘                    │       ▼                          │
+                                        │  UFW forward (PostUp hook):      │
+                                        │   ALLOW FWD wg0 → enp0s31f6      │
+                                        │       │                          │
+                                        │       ▼                          │
+                                        │  iptables MASQUERADE             │
+                                        │   on enp0s31f6                   │
+                                        └───────│──────────────────────────┘
+                                                ▼
+                                          internet (via 192.168.1.1)
+```
+
+UFW policy comes from three layers: static rules from `scripts/ufw-rules.sh`,
+dynamic per-interface rules added by `wg0.conf`'s `PostUp` / `PreDown` hooks,
+and `iptables` NAT for masquerading. See [`docs/architecture.md`](docs/architecture.md)
+for the full data-plane diagram, control-plane (deploy → CLI → wg-quick),
+peer table, and security boundaries.
+
+For the live state of the production server (port, peers, UFW rules),
+see [`docs/CURRENT-CONFIG.md`](docs/CURRENT-CONFIG.md).
+
 ## Requirements
 
 - Ubuntu 24.04 server

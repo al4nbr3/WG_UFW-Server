@@ -86,3 +86,10 @@
 - [ ] Review whether `5601/tcp` (Kibana) and `9200/tcp` (Elasticsearch) should be LAN-scoped instead of Anywhere
 - [ ] Add a DDNS hostname for the server's public IP and use it in client `Endpoint =`
 - [ ] Update `lib/wireguard.py` and `wg_ufw_manager.py` defaults to `443/udp` for new deployments
+
+## Session: 2026-04-30 — Architecture Documentation
+
+### Completed
+- [x] Created `docs/architecture.md` — data plane (peer → wg0 → MASQUERADE → enp0s31f6), control plane (deploy.sh → CLI → wg-quick), UFW rule structure (static + PostUp dynamic + iptables NAT), peer table, security boundaries, and known non-goals
+- [x] Updated `README.md` — added compact Architecture section with ASCII diagram and links to `docs/architecture.md` + `docs/CURRENT-CONFIG.md`
+- [x] Style mirrors `cadena-prox/docs/architecture.md` so both projects read consistently when looked at side-by-side
