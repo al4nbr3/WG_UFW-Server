@@ -8,9 +8,9 @@ SaveConfig = true
 ListenPort = 51820
 PrivateKey = <SERVER_PRIVATE_KEY>
 
-PostUp = ufw route allow in on wg0 out on <NETWORK_INTERFACE>
+PostUp = /usr/sbin/ufw route allow in on wg0 out on <NETWORK_INTERFACE>
 PostUp = iptables -t nat -I POSTROUTING -o <NETWORK_INTERFACE> -j MASQUERADE
-PreDown = ufw route delete allow in on wg0 out on <NETWORK_INTERFACE>
+PreDown = /usr/sbin/ufw route delete allow in on wg0 out on <NETWORK_INTERFACE>
 PreDown = iptables -t nat -D POSTROUTING -o <NETWORK_INTERFACE> -j MASQUERADE
 
 # Peers are added below by: wg set wg0 peer <PUBKEY> allowed-ips <IP>/32
