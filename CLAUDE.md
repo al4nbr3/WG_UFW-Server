@@ -8,14 +8,19 @@ WG_UFW-Server manages a WireGuard VPN + UFW firewall on Ubuntu 24.04. The server
 - **Remote server:** `192.168.1.195` (hostname: `V10L3T4`, user: `observa`)
 - **Deployed path:** `/opt/WG_UFW-Server`
 - **WireGuard interface:** `wg0` on `enp0s31f6`, server IP `10.0.0.1/24`
-- **WireGuard port:** `51820/udp`
-- **GitHub repo:** `https://github.com/al4nbr3/WG_UFW-Server`
+- **WireGuard port:** `443/udp` on V10L3T4 (default for new installs is still `51820/udp`)
+- **GitHub repo:** `https://github.com/al4nbr3/WG_UFW-Server` (private)
+
+The server also runs **Tor** (`SocksPort 9050`, LAN-scoped) and **Privoxy**
+(`8118`, chains HTTP through Tor) — see `docs/CURRENT-CONFIG.md`.
 
 ## Registered Clients
 
 | Name | IP | Device |
 |------|----|--------|
 | p0rk3y | 10.0.0.2/32 | Windows PC |
+| (peer-3) | 10.0.0.3/32 | LAN client |
+| (peer-4) | 10.0.0.4/32 | Remote/WAN client |
 
 ## Commands
 
@@ -52,6 +57,8 @@ bash scripts/stop-wg.sh              # Stop WireGuard interface
 bash scripts/status.sh               # Show WireGuard + UFW status
 bash scripts/backup.sh               # Backup WireGuard config
 bash scripts/cleanup-server.sh       # Remove non-essential services/packages
+bash scripts/sync-config.sh          # Apply edits in /etc/wireguard/wg0.conf live
+bash scripts/audit-server.sh         # Snapshot WG + Tor + Privoxy + UFW state
 ```
 
 ## Architecture

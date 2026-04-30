@@ -2,6 +2,12 @@
 
 WireGuard VPN + UFW Firewall on Ubuntu 24.04 with Claude AI assistant.
 
+> **Looking for the live state of the production server (V10L3T4)?**
+> See [`CURRENT-CONFIG.md`](CURRENT-CONFIG.md). This guide describes a
+> fresh install using project defaults; the production deployment overrides
+> a few values (e.g. WireGuard listens on `443/udp` instead of `51820/udp`,
+> and Tor + Privoxy are also installed alongside).
+
 ---
 
 ## Requirements
@@ -198,6 +204,26 @@ when the WireGuard interface comes up or goes down.
 - Client private keys are generated locally and saved to `config/clients/<name>.conf` — **never committed to git**
 - The `.gitignore` excludes all `*.key`, `.env`, and `config/clients/` files
 - Preshared keys (PSK) add a layer of post-quantum resistance between each peer pair
+
+---
+
+## Tor + Privoxy (V10L3T4 deployment)
+
+The production server also runs **Tor** and **Privoxy** for LAN clients that
+want to route HTTP traffic through Tor. These aren't part of a fresh install
+of this project — they were configured separately on V10L3T4. For the live
+config (ports, SocksPolicy, hidden service, forward chain), see
+[`CURRENT-CONFIG.md`](CURRENT-CONFIG.md).
+
+LAN usage from any client on `192.168.1.0/24`:
+
+| Proxy type | Address |
+|------------|---------|
+| HTTP (via Privoxy → Tor) | `192.168.1.195:8118` |
+| SOCKS5 (direct to Tor) | `192.168.1.195:9050` |
+
+UFW already restricts both ports to `192.168.1.0/24`. Do **not** open them
+to `Anywhere`.
 
 ---
 

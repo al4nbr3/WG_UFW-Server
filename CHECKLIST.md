@@ -53,3 +53,36 @@
 - [ ] Add DNS leak test script
 - [ ] Add monitoring/status web dashboard
 - [ ] Add auto-renewal for IP forwarding on kernel updates
+
+## Session: 2026-04-30 — Configuration Audit (WG + Tor + Privoxy)
+
+### Verified live state on V10L3T4 (192.168.1.195)
+- [x] WireGuard `wg-quick@wg0` enabled + active
+- [x] WireGuard listen port confirmed as **`443/udp`** (changed from documented `51820/udp`)
+- [x] 3 peers active on wg0: `10.0.0.2/32`, `10.0.0.3/32`, `10.0.0.4/32`
+- [x] PostUp/PreDown hooks use full path `/usr/sbin/ufw` (avoids PATH issues under wg-quick)
+- [x] `iptables MASQUERADE` on `enp0s31f6` for outbound NAT
+- [x] `net.ipv4.ip_forward = 1`
+- [x] Tor service enabled + active — SocksPort on `127.0.0.1:9050` and `192.168.1.195:9050`
+- [x] Tor SocksPolicy restricts SOCKS to localhost + `192.168.1.0/24`
+- [x] Tor Hidden Service configured (`/var/lib/tor/hidden_service/`, port 80 → `127.0.0.1:8080`)
+- [x] Privoxy enabled + active — listens on lo + `192.168.1.195:8118`
+- [x] Privoxy chains all HTTP through Tor (`forward-socks5t / 127.0.0.1:9050 .`)
+- [x] UFW exposes `9050/tcp` and `8118/tcp` to LAN only
+
+### Completed
+- [x] Stripped stale `Endpoint =` lines from `/etc/wireguard/wg0.conf` peer blocks
+- [x] Created `docs/CURRENT-CONFIG.md` — single source of truth for live deployment state
+- [x] Created `scripts/sync-config.sh` — apply `wg0.conf` edits live via `wg syncconf` without bouncing the interface
+- [x] Created `scripts/audit-server.sh` — one-shot audit of WG + Tor + Privoxy + UFW
+- [x] Patched `config/wg0.conf.template` — full path `/usr/sbin/ufw` in PostUp/PreDown
+- [x] Patched `docs/SETUP.md` — added pointer to `CURRENT-CONFIG.md` and a Tor + Privoxy section
+- [x] Patched `CLAUDE.md` — port now `443/udp`, registered clients table updated to 3 peers
+- [x] Removed stray `192.168.1.9` file (nmap output left from a typo'd `-o` flag)
+
+### Pending
+- [ ] Decide whether to flip `SaveConfig = true` → `false` (avoids wg-quick rewriting the file on stop)
+- [ ] Remove stale UFW rule `51820/udp ALLOW Anywhere` (no longer in use)
+- [ ] Review whether `5601/tcp` (Kibana) and `9200/tcp` (Elasticsearch) should be LAN-scoped instead of Anywhere
+- [ ] Add a DDNS hostname for the server's public IP and use it in client `Endpoint =`
+- [ ] Update `lib/wireguard.py` and `wg_ufw_manager.py` defaults to `443/udp` for new deployments
