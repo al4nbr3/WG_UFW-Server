@@ -93,3 +93,13 @@
 - [x] Created `docs/architecture.md` — data plane (peer → wg0 → MASQUERADE → enp0s31f6), control plane (deploy.sh → CLI → wg-quick), UFW rule structure (static + PostUp dynamic + iptables NAT), peer table, security boundaries, and known non-goals
 - [x] Updated `README.md` — added compact Architecture section with ASCII diagram and links to `docs/architecture.md` + `docs/CURRENT-CONFIG.md`
 - [x] Style mirrors `cadena-prox/docs/architecture.md` so both projects read consistently when looked at side-by-side
+
+## Session: 2026-04-30 — README cleanup
+
+### Completed
+- [x] Removed `sudo` prefix from all script invocations in README (project rule: scripts call sudo internally; users run as normal user)
+- [x] Added explicit "Don't prefix with sudo" callout in the Setup section + a note on the Scripts Reference table
+- [x] Annotated `WG_PORT=51820` in the env example as the default; noted production V10L3T4 uses 443
+- [x] Added `sync-config.sh` and `audit-server.sh` to the Scripts Reference table with their own usage subsections
+- [x] Fixed `cleanup-server.sh` description — was "Removes WireGuard and resets UFW" (wrong); now reflects "removes non-essential packages, leaves WG+UFW intact"
+- [x] Sharpened other Scripts Reference descriptions (e.g. `start-wg.sh` notes the systemd enable; `add-client.sh` notes both wg0.conf edit and client config generation)

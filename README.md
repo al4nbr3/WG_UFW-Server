@@ -76,29 +76,32 @@ Set the following values:
 
 ```env
 SERVER_PUBLIC_IP=your.server.ip
-WG_PORT=51820
+WG_PORT=51820                     # default; production V10L3T4 uses 443 instead
 WG_SERVER_IP=10.0.0.1
 WG_DNS=1.1.1.1, 8.8.8.8
 ANTHROPIC_API_KEY=your_key_here   # optional
 ```
 
-**4. Run the server setup script**
+> Don't prefix any of the scripts below with `sudo` — they call `sudo` internally
+> for the bits that need it. Run them as your normal user.
+
+**4. Run the server setup scripts**
 
 ```bash
-sudo bash scripts/install.sh
-sudo bash scripts/configure-server.sh
+bash scripts/install.sh
+bash scripts/configure-server.sh
 ```
 
 **5. Apply UFW firewall rules**
 
 ```bash
-sudo bash scripts/ufw-rules.sh
+bash scripts/ufw-rules.sh
 ```
 
 **6. Start WireGuard**
 
 ```bash
-sudo bash scripts/start-wg.sh
+bash scripts/start-wg.sh
 ```
 
 ## Usage
@@ -126,26 +129,48 @@ A `.conf` file will be generated — share it with the client device.
 ### Remove a Client
 
 ```bash
-sudo bash scripts/remove-client.sh clientname
+bash scripts/remove-client.sh clientname
 ```
 
 ### Stop WireGuard
 
 ```bash
-sudo bash scripts/stop-wg.sh
+bash scripts/stop-wg.sh
 ```
 
 ### Backup Configuration
 
 ```bash
-sudo bash scripts/backup.sh
+bash scripts/backup.sh
 ```
 
-### Cleanup Server
+### Apply edited `wg0.conf` without bouncing the interface
 
 ```bash
-sudo bash scripts/cleanup-server.sh
+bash scripts/sync-config.sh
 ```
+
+Use this after editing `/etc/wireguard/wg0.conf` by hand. It calls
+`wg syncconf` so the running peers stay connected. Restarting `wg-quick@wg0`
+would, with `SaveConfig = true`, overwrite manual edits with runtime state.
+
+### Snapshot full server state
+
+```bash
+bash scripts/audit-server.sh
+```
+
+Prints WireGuard, Tor, Privoxy, UFW, and routing state in one shot.
+
+### Strip non-essential services / packages
+
+```bash
+bash scripts/cleanup-server.sh
+```
+
+Removes packages this VPN box doesn't need (logstash, suricata, snort,
+samba, cups, bluetooth, browsers, VirtualBox, etc.) — does **not** remove
+WireGuard or UFW.
 
 ## AI Assistant
 
@@ -157,16 +182,20 @@ python wg_ufw_manager.py --ask "How do I add a client for a mobile device?"
 
 ## Scripts Reference
 
+All scripts call `sudo` internally where needed — run them as your normal user.
+
 | Script | Description |
 |--------|-------------|
-| `install.sh` | Installs WireGuard and dependencies |
-| `configure-server.sh` | Generates server keys and config |
-| `ufw-rules.sh` | Sets UFW rules for VPN traffic |
-| `start-wg.sh` | Starts the WireGuard interface |
+| `install.sh` | Installs WireGuard, UFW, and dependencies |
+| `configure-server.sh` | Generates server keys and writes `/etc/wireguard/wg0.conf` |
+| `ufw-rules.sh` | Applies the static UFW rule set for the VPN |
+| `start-wg.sh` | Brings up `wg-quick@wg0` and enables it on boot |
 | `stop-wg.sh` | Stops the WireGuard interface |
-| `add-client.sh` | Adds a new VPN client |
-| `remove-client.sh` | Removes a VPN client |
-| `status.sh` | Shows WireGuard and UFW status |
+| `add-client.sh` | Adds a new VPN peer (writes `wg0.conf` + generates client config) |
+| `remove-client.sh` | Removes a VPN peer |
+| `status.sh` | Shows WireGuard + UFW + systemd status |
+| `sync-config.sh` | Applies `/etc/wireguard/wg0.conf` edits to the live interface via `wg syncconf` (no bounce) |
+| `audit-server.sh` | One-shot snapshot of WireGuard, Tor, Privoxy, UFW, and routing |
 | `backup.sh` | Backs up server configuration |
-| `cleanup-server.sh` | Removes WireGuard and resets UFW |
-| `deploy.sh` | Full automated deployment |
+| `cleanup-server.sh` | Removes non-essential packages (browsers, samba, cups, etc.) — leaves WireGuard + UFW intact |
+| `deploy.sh` | rsync-over-SSH deploy from a workstation to the gateway |
