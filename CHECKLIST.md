@@ -103,3 +103,30 @@
 - [x] Added `sync-config.sh` and `audit-server.sh` to the Scripts Reference table with their own usage subsections
 - [x] Fixed `cleanup-server.sh` description — was "Removes WireGuard and resets UFW" (wrong); now reflects "removes non-essential packages, leaves WG+UFW intact"
 - [x] Sharpened other Scripts Reference descriptions (e.g. `start-wg.sh` notes the systemd enable; `add-client.sh` notes both wg0.conf edit and client config generation)
+
+## Session: 2026-05-01 — Client connectivity troubleshooting (p0rk3y over LAN + AT&T Mi-Fi)
+
+### Verified
+- [x] `wg show wg0` confirmed: prior to today, **no peer had ever completed a successful handshake** (no `latest handshake:` line on any peer since the service started 2026-04-18)
+- [x] Static WAN IP confirmed via `curl ifconfig.me / ipify / ipinfo` from V10L3T4 — `173.72.152.119` (Verizon FIOS, `pool-173-72-152-119.clppva.fios.verizon.net`)
+- [x] Router port-forward `UDP/443 → 192.168.1.195` is in place and working — confirmed by Slot C handshake from the AT&T Mi-Fi cellular WAN (`107.121.104.39`)
+- [x] Slot B (LAN endpoint) handshake — verified with `Transfer: 638 KiB rx / 1.22 MiB sent`
+- [x] Slot C (WAN endpoint) handshake from cellular — verified with `Transfer: 885 KiB rx / 1.30 MiB sent`
+- [x] p0rk3y current LAN IP is `192.168.1.194` (was `192.168.1.248` in March; DHCP-dynamic with MAC randomization)
+
+### Root causes identified
+- [x] **Client `.conf` shipped with `Endpoint = ...:51820`** — wrong port. Server listens on `443/udp`. Caused 100% of "tunnel active but 0 B received" symptoms. Root cause: `lib/wireguard.py` and `wg_ufw_manager.py` defaults still on `51820/udp`.
+- [x] **`AllowedIPs = 0.0.0.0/0` kill-switch behavior** — when handshake silently fails, Windows blocks all non-tunnel traffic, producing the "internet went black" symptom.
+- [x] **NAT hairpinning** — Verizon CR1000B doesn't fold WAN→WAN-IP packets back into the LAN, so Slot C (WAN endpoint) doesn't work when the client is at home. Two-tunnel pattern (Slot B for home, Slot C for off-LAN) is the workaround.
+- [x] **Cellular MTU** — AT&T Mi-Fi effective path MTU < 1420 (WG default). Small packets (ping, SYN) traverse; large packets (SSH key exchange, TLS, API responses) silently drop. Fix: `MTU = 1280` in client `[Interface]` block.
+- [x] **"Connection refused" reports** were Winsock-layer artifacts from the kill switch + failed handshake — not real TCP RSTs from the destination.
+
+### Documented
+- [x] Created `docs/TROUBLESHOOTING.md` — symptom-first reference covering all 5 issues above with diagnosis/fix/verify for each
+- [x] Updated `docs/CURRENT-CONFIG.md` — added Public WAN IP (`173.72.152.119`, static), router port-forward state, and per-slot peer notes (Slot B = LAN, Slot C = WAN, MTU note)
+
+### Pending follow-ups
+- [ ] Update `lib/wireguard.py` and `wg_ufw_manager.py` defaults: WG port `51820 → 443` and add `MTU = 1280` to generated client configs
+- [ ] Remove the legacy `UDP/51820 → 192.168.1.195` rule on the Verizon router (no longer in use)
+- [ ] Remove the legacy `51820/udp ALLOW Anywhere` rule from UFW on V10L3T4
+- [ ] Clean up the orphan `10.0.0.2/32` peer in `wg0.conf` (slot exists but no client `.conf` was ever deployed to a device)

@@ -13,9 +13,20 @@ live files on the remote for those values.
 |------|-------|
 | Hostname | `V10L3T4` |
 | LAN IP | `192.168.1.195` |
+| **Public WAN IP** | **`173.72.152.119`** (Verizon FIOS, **static** — no DDNS required) |
 | Kernel | `6.8.0-110-generic` (Ubuntu) |
 | Default interface | `enp0s31f6` |
 | Deployed project path | `/opt/WG_UFW-Server` |
+
+Reverse DNS: `pool-173-72-152-119.clppva.fios.verizon.net`. Confirmed static
+2026-05-01.
+
+### Upstream router (Verizon CR1000B at `192.168.1.1`)
+
+| Forward | Status |
+|---------|--------|
+| `UDP/443 → 192.168.1.195:443` | **Required** for off-LAN WireGuard handshakes (Slot C / cellular). Currently working as of 2026-05-01 (handshake from AT&T Mi-Fi WAN confirmed). |
+| `UDP/51820 → 192.168.1.195` | **Legacy** — was used before WG moved to 443/udp. Safe to remove from the router. |
 
 ---
 
@@ -40,11 +51,11 @@ PreDown = iptables -t nat -D POSTROUTING -o enp0s31f6 -j MASQUERADE
 
 ### Peers
 
-| Tunnel IP | Public key (truncated) | Notes |
-|-----------|------------------------|-------|
-| `10.0.0.2/32` | `IDkYO+1b…` | LAN client — endpoint roams |
-| `10.0.0.3/32` | `2FhYqmqv…` | LAN client — endpoint roams |
-| `10.0.0.4/32` | `dulWIAN6…` | Remote/WAN client — endpoint roams |
+| Tunnel IP | Public key (truncated) | Role | Notes |
+|-----------|------------------------|------|-------|
+| `10.0.0.2/32` | `IDkYO+1b…` | (orphan) | Slot exists but no client `.conf` was deployed to a device. Safe to remove. |
+| `10.0.0.3/32` | `2FhYqmqv…` | **Slot B — LAN endpoint** | p0rk3y (Windows) when at home. Client `Endpoint = 192.168.1.195:443`. Verified handshake 2026-05-01. |
+| `10.0.0.4/32` | `dulWIAN6…` | **Slot C — WAN endpoint** | p0rk3y (Windows) when off-LAN (cellular/remote). Client `Endpoint = 173.72.152.119:443`. Requires `MTU = 1280` for cellular paths. Verified handshake 2026-05-01 from AT&T Mi-Fi (cellular IP `107.121.104.39`). |
 
 All three peers use a `PresharedKey`. Full keys live in `/etc/wireguard/wg0.conf`
 on the server (root-only) — never copy them into this repo.
