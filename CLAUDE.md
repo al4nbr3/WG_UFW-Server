@@ -93,6 +93,6 @@ wg_ufw_manager.py (CLI entry point)
 
 To continue working on this project in a new session:
 1. Open Claude Code from any machine
-2. `cd /mnt/jbaez_data/Scripts-linux/WG_UFW-Server`
+2. `cd /mnt/jbaez_data/Scripts-linux/WG-home-VPN`
 3. Read `CHECKLIST.md` to see current state and pending tasks
 4. SSH into remote: `ssh observa@192.168.1.195`

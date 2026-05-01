@@ -140,10 +140,12 @@
 - [x] Rebranded doc headers / titles to `WG-home-VPN` in `README.md`, `CHECKLIST.md` (this file), `docs/SETUP.md`, `docs/TROUBLESHOOTING.md`, `docs/architecture.md` (intro + control-plane diagram), and `CLAUDE.md` (with a "formerly WG_UFW-Server" note for breadcrumbing)
 - [x] Updated descriptive strings in `wg_ufw_manager.py` (docstring + argparse description), `scripts/deploy.sh` (comment + echo), and `.env.example` (header)
 - [x] Updated memory `project_wg_ufw.md` to reflect the new GitHub URL + rename date
-- [x] Added a "Naming note" callout to `README.md` clarifying that *paths* (e.g., `/opt/WG_UFW-Server`, the local clone path, the `wg_ufw_manager.py` module) **were intentionally NOT renamed** — those are deferred to avoid disturbing the live deployment
+- [x] Added a "Naming note" callout to `README.md` clarifying that *paths* (e.g., `/opt/WG_UFW-Server`, the `wg_ufw_manager.py` module) **were intentionally NOT renamed** — those are deferred to avoid disturbing the live deployment
+- [x] Renamed local clone directory `/mnt/jbaez_data/Scripts-linux/WG_UFW-Server` → `WG-home-VPN`; updated the path reference in `CLAUDE.md` "Resuming Work" and in memory `project_wg_ufw.md`
 
-### Intentionally NOT renamed (deferred)
-- [ ] Local clone directory `/mnt/jbaez_data/Scripts-linux/WG_UFW-Server` (would require coordinated `mv` + updating any local aliases/scripts)
-- [ ] Remote deployed path `/opt/WG_UFW-Server` on V10L3T4 (would require coordinated SSH `mv` on the remote + updating `scripts/deploy.sh` `REMOTE_PATH` + redeploy)
+### Still deferred
+- [ ] Remote deployed path `/opt/WG_UFW-Server` on V10L3T4 (requires coordinated SSH `mv` on the remote + updating `scripts/deploy.sh` `REMOTE_PATH` + redeploy)
 - [ ] Python module / CLI file name `wg_ufw_manager.py` (renaming changes the entry-point and any scripts/aliases that call it)
-- [ ] Historical `WG_UFW-Server` mentions inside earlier CHECKLIST sessions (left as-is to preserve the record of what existed at that point in time)
+
+### Notes
+- Historical `WG_UFW-Server` mentions inside earlier CHECKLIST sessions are intentionally preserved — they're a record of what existed at that point in time, not work to be redone.
