@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-WG_UFW-Server manages a WireGuard VPN + UFW firewall on Ubuntu 24.04. The server is deployed at:
+WG-home-VPN (formerly `WG_UFW-Server` — repo renamed 2026-05-01) manages a WireGuard VPN + UFW firewall on Ubuntu 24.04. The server is deployed at:
 - **Remote server:** `192.168.1.195` (hostname: `V10L3T4`, user: `observa`)
 - **Deployed path:** `/opt/WG_UFW-Server`
 - **WireGuard interface:** `wg0` on `enp0s31f6`, server IP `10.0.0.1/24`

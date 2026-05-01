@@ -1,6 +1,6 @@
 # Architecture
 
-WG_UFW-Server is a single-host WireGuard VPN gateway with UFW as the policy layer.
+WG-home-VPN is a single-host WireGuard VPN gateway with UFW as the policy layer.
 Everything lives on **`.195`** (V10L3T4): the WireGuard kernel interface, the UFW
 rules that filter what can reach it and where its traffic can go, and the
 `wg_ufw_manager.py` CLI that drives both.
@@ -61,7 +61,7 @@ Key points:
 ```
  Operator workstation (any host)                     Gateway .195
  ┌──────────────────────────────────┐               ┌────────────────────────────────┐
- │ git clone WG_UFW-Server          │               │ /opt/WG_UFW-Server             │
+ │ git clone WG-home-VPN            │               │ /opt/WG_UFW-Server             │
  │   │                              │               │   ├── wg_ufw_manager.py        │
  │   ▼                              │  rsync/SSH    │   ├── lib/wireguard.py         │
  │ scripts/deploy.sh ───────────────┼──────────────▶│   ├── lib/ufw.py               │

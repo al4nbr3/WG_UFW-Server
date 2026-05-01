@@ -1,4 +1,4 @@
-# CHECKLIST.md — WG_UFW-Server
+# CHECKLIST.md — WG-home-VPN
 
 ## Session: 2026-03-14 — Initial Project Setup
 
@@ -130,3 +130,20 @@
 - [ ] Remove the legacy `UDP/51820 → 192.168.1.195` rule on the Verizon router (no longer in use)
 - [ ] Remove the legacy `51820/udp ALLOW Anywhere` rule from UFW on V10L3T4
 - [ ] Clean up the orphan `10.0.0.2/32` peer in `wg0.conf` (slot exists but no client `.conf` was ever deployed to a device)
+
+## Session: 2026-05-01 — Repo rename to WG-home-VPN
+
+### Completed
+- [x] Renamed GitHub repo: `al4nbr3/WG_UFW-Server` → `al4nbr3/WG-home-VPN` (still PRIVATE; old URL auto-redirects)
+- [x] Updated local git remote `origin` to the new URL
+- [x] Updated GitHub clone URLs in `README.md`, `docs/SETUP.md`, and project pointer in `CLAUDE.md`
+- [x] Rebranded doc headers / titles to `WG-home-VPN` in `README.md`, `CHECKLIST.md` (this file), `docs/SETUP.md`, `docs/TROUBLESHOOTING.md`, `docs/architecture.md` (intro + control-plane diagram), and `CLAUDE.md` (with a "formerly WG_UFW-Server" note for breadcrumbing)
+- [x] Updated descriptive strings in `wg_ufw_manager.py` (docstring + argparse description), `scripts/deploy.sh` (comment + echo), and `.env.example` (header)
+- [x] Updated memory `project_wg_ufw.md` to reflect the new GitHub URL + rename date
+- [x] Added a "Naming note" callout to `README.md` clarifying that *paths* (e.g., `/opt/WG_UFW-Server`, the local clone path, the `wg_ufw_manager.py` module) **were intentionally NOT renamed** — those are deferred to avoid disturbing the live deployment
+
+### Intentionally NOT renamed (deferred)
+- [ ] Local clone directory `/mnt/jbaez_data/Scripts-linux/WG_UFW-Server` (would require coordinated `mv` + updating any local aliases/scripts)
+- [ ] Remote deployed path `/opt/WG_UFW-Server` on V10L3T4 (would require coordinated SSH `mv` on the remote + updating `scripts/deploy.sh` `REMOTE_PATH` + redeploy)
+- [ ] Python module / CLI file name `wg_ufw_manager.py` (renaming changes the entry-point and any scripts/aliases that call it)
+- [ ] Historical `WG_UFW-Server` mentions inside earlier CHECKLIST sessions (left as-is to preserve the record of what existed at that point in time)

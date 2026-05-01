@@ -1,6 +1,12 @@
-# WG_UFW-Server
+# WG-home-VPN
 
 WireGuard VPN + UFW Firewall manager for Ubuntu 24.04 with an optional Claude AI assistant for troubleshooting and guidance.
+
+> **Naming note:** the GitHub repo and project name are `WG-home-VPN` as of 2026-05-01.
+> Internal directory paths (`/opt/WG_UFW-Server` on the deployed server, the local
+> clone path, and the `wg_ufw_manager.py` module name) still use the original
+> `WG_UFW-Server` for now — those will be migrated separately to avoid disturbing
+> the live deployment.
 
 ## Features
 

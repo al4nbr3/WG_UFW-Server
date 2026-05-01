@@ -1,4 +1,4 @@
-# Troubleshooting — WG_UFW-Server
+# Troubleshooting — WG-home-VPN
 
 Symptom-first reference for problems encountered (and resolved) when bringing
 client tunnels up against `V10L3T4`. If you're reconstructing the project on

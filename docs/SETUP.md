@@ -1,4 +1,4 @@
-# WG_UFW-Server Setup Guide
+# WG-home-VPN Setup Guide
 
 WireGuard VPN + UFW Firewall on Ubuntu 24.04 with Claude AI assistant.
 

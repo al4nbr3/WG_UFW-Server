@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""WG_UFW-Server — WireGuard + UFW manager with optional Claude AI assistant."""
+"""WG-home-VPN — WireGuard + UFW manager with optional Claude AI assistant."""
 
 import argparse
 import os
@@ -112,7 +112,7 @@ def cmd_ufw_rules() -> None:
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="WG_UFW-Server — WireGuard + UFW manager"
+        description="WG-home-VPN — WireGuard + UFW manager"
     )
     parser.add_argument("--status", action="store_true", help="Show WireGuard + UFW status")
     parser.add_argument("--list-clients", action="store_true", help="List registered clients")

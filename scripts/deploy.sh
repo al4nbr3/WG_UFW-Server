@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
-# Deploy WG_UFW-Server to remote host via rsync over SSH
+# Deploy WG-home-VPN to remote host via rsync over SSH
 set -euo pipefail
 
 REMOTE_USER="observa"
 REMOTE_HOST="192.168.1.195"
 REMOTE_PATH="/opt/WG_UFW-Server"
 
-echo "==> Deploying WG_UFW-Server to ${REMOTE_USER}@${REMOTE_HOST}:${REMOTE_PATH}"
+echo "==> Deploying WG-home-VPN to ${REMOTE_USER}@${REMOTE_HOST}:${REMOTE_PATH}"
 
 # Create destination directory on remote (uses -t for sudo TTY)
 ssh -t "${REMOTE_USER}@${REMOTE_HOST}" "sudo mkdir -p ${REMOTE_PATH} && sudo chown ${REMOTE_USER}:${REMOTE_USER} ${REMOTE_PATH}"
