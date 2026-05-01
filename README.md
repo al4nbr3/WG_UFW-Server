@@ -53,8 +53,8 @@ see [`docs/CURRENT-CONFIG.md`](docs/CURRENT-CONFIG.md).
 **1. Clone the repository**
 
 ```bash
-git clone https://github.com/al4nbr3/WG_UFW-Server.git
-cd WG_UFW-Server
+git clone https://github.com/al4nbr3/WG-home-VPN.git
+cd WG-home-VPN
 ```
 
 **2. Create and activate a virtual environment**

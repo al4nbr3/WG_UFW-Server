@@ -9,7 +9,7 @@ WG_UFW-Server manages a WireGuard VPN + UFW firewall on Ubuntu 24.04. The server
 - **Deployed path:** `/opt/WG_UFW-Server`
 - **WireGuard interface:** `wg0` on `enp0s31f6`, server IP `10.0.0.1/24`
 - **WireGuard port:** `443/udp` on V10L3T4 (default for new installs is still `51820/udp`)
-- **GitHub repo:** `https://github.com/al4nbr3/WG_UFW-Server` (private)
+- **GitHub repo:** `https://github.com/al4nbr3/WG-home-VPN` (private; renamed 2026-05-01 from `WG_UFW-Server`)
 
 The server also runs **Tor** (`SocksPort 9050`, LAN-scoped) and **Privoxy**
 (`8118`, chains HTTP through Tor) — see `docs/CURRENT-CONFIG.md`.

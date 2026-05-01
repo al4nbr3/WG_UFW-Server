@@ -25,8 +25,8 @@ WireGuard VPN + UFW Firewall on Ubuntu 24.04 with Claude AI assistant.
 ## Step 1 — Clone the project
 
 ```bash
-git clone https://github.com/al4nbr3/WG_UFW-Server.git
-cd WG_UFW-Server
+git clone https://github.com/al4nbr3/WG-home-VPN.git
+cd WG-home-VPN
 ```
 
 ---
