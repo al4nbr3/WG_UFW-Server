@@ -22,6 +22,32 @@ The server also runs **Tor** (`SocksPort 9050`, LAN-scoped) and **Privoxy**
 | (peer-3) | 10.0.0.3/32 | LAN client |
 | (peer-4) | 10.0.0.4/32 | Remote/WAN client |
 
+## API — Status Dashboard
+
+A FastAPI web service that runs on port `8800` and provides:
+- **Live peer status** — who's connected, handshake times, transfer data
+- **Connection tracking** — each peer's connection history with source IPs
+- **Config overview** — server settings with keys/endpoints obfuscated
+
+### Endpoints
+
+| Endpoint | Description |
+|---|---|
+| `GET /` | Interactive web dashboard |
+| `GET /api/summary` | Quick stats (connected, total, total connections) |
+| `GET /api/peers` | Live peer list with status + transfer data |
+| `GET /api/peers/{key}/history` | Connection history for a peer |
+| `GET /api/config` | Server config (obfuscated) |
+| `GET /api/docs` | Swagger UI |
+
+### Deploy / manage
+
+```bash
+bash scripts/deploy-api.sh          # Deploy API to remote, install service
+```
+
+The API runs as `wg-api.service` on the remote. Background tracker polls `wg show wg0 dump` every 30s and logs handshake changes to SQLite (`api/wg_history.db`).
+
 ## Commands
 
 ```bash
@@ -68,6 +94,10 @@ wg_ufw_manager.py (CLI entry point)
     ├── lib/wireguard.py     → WireGuard key gen, peer management, config I/O
     ├── lib/ufw.py           → UFW rule generation and application
     ├── lib/ai_assistant.py  → Claude API integration for guided setup/troubleshooting
+    ├── api/                 → FastAPI status dashboard (port 8800)
+    │   ├── main.py          → API routes + background connection tracker
+    │   ├── db.py            → SQLite connection history
+    │   └── templates/       → Interactive web dashboard
     └── scripts/             → Privileged bash scripts (all sudo operations here)
 ```
 

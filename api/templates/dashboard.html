@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WG-home-VPN · Status</title>
+<style>
+  :root {
+    --bg: #0d1117; --surface: #161b22; --card: #1c2128; --border: #30363d;
+    --accent: #58a6ff; --green: #3fb950; --yellow: #d29922; --red: #f85149;
+    --purple: #bc8cff; --text: #e6edf3; --muted: #8b949e;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; font-size: 14px; padding: 24px 16px; }
+  .container { max-width: 1000px; margin: 0 auto; }
+  h1 { font-size: 1.5rem; margin-bottom: 4px; }
+  .subtitle { color: var(--muted); font-size: 0.85rem; margin-bottom: 20px; }
+
+  .summary { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 20px; }
+  .stat { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 12px 18px; flex: 1; min-width: 120px; }
+  .stat .num { font-size: 1.6rem; font-weight: 700; }
+  .stat .lbl { font-size: 0.75rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.3px; }
+  .num-green { color: var(--green); }
+  .num-yellow { color: var(--yellow); }
+  .num-blue { color: var(--accent); }
+
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 8px; margin-bottom: 12px; overflow: hidden; }
+  .card-header { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; cursor: pointer; transition: background 0.15s; }
+  .card-header:hover { background: var(--surface); }
+  .card-header .left { display: flex; align-items: center; gap: 10px; }
+  .card-header .right { display: flex; align-items: center; gap: 12px; color: var(--muted); font-size: 0.8rem; }
+  .dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+  .dot-up { background: var(--green); box-shadow: 0 0 6px var(--green); }
+  .dot-down { background: var(--muted); }
+  .dot-never { background: var(--red); }
+  .arrow { transition: transform 0.2s; font-size: 0.7rem; color: var(--muted); }
+  .arrow.open { transform: rotate(90deg); }
+
+  .card-body { padding: 0 16px 16px; display: none; }
+  .card-body.open { display: block; }
+  .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 20px; margin-bottom: 12px; }
+  .info-grid .label { color: var(--muted); font-size: 0.75rem; }
+  .info-grid .value { font-family: monospace; font-size: 0.85rem; }
+  .info-grid .full { grid-column: 1 / -1; }
+
+  .history-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
+  .history-table th { text-align: left; color: var(--muted); font-weight: 600; padding: 6px 8px; border-bottom: 1px solid var(--border); }
+  .history-table td { padding: 5px 8px; border-bottom: 1px solid var(--border); font-family: monospace; }
+  .history-table tr:hover td { background: var(--surface); }
+
+  .config-section { margin-top: 24px; }
+  .config-section h2 { font-size: 0.9rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 10px; padding-bottom: 6px; border-bottom: 1px solid var(--border); }
+  .config-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 16px; }
+  .config-grid .label { color: var(--muted); font-size: 0.75rem; }
+  .config-grid .value { font-family: monospace; font-size: 0.85rem; }
+  .config-grid .full { grid-column: 1 / -1; }
+
+  .peers-config { margin-top: 12px; }
+  .peers-config table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
+  .peers-config th { text-align: left; color: var(--muted); font-weight: 600; padding: 6px 8px; border-bottom: 1px solid var(--border); }
+  .peers-config td { padding: 5px 8px; border-bottom: 1px solid var(--border); font-family: monospace; }
+
+  .loading { text-align: center; padding: 40px; color: var(--muted); }
+  .error { color: var(--red); padding: 20px; text-align: center; }
+
+  .refresh { font-size: 0.75rem; color: var(--accent); cursor: pointer; text-decoration: none; }
+  .refresh:hover { text-decoration: underline; }
+
+  @media (max-width: 600px) {
+    .info-grid { grid-template-columns: 1fr; }
+    .config-grid { grid-template-columns: 1fr; }
+    .card-header { flex-wrap: wrap; gap: 6px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <div style="display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;">
+    <div>
+      <h1>WG-home-VPN</h1>
+      <div class="subtitle">Live status &mdash; auto-refreshes every 15s</div>
+    </div>
+    <a class="refresh" href="#" onclick="location.reload()">&#x21bb; refresh now</a>
+  </div>
+
+  <div class="summary" id="summary"></div>
+  <div id="peers-list"></div>
+  <div class="config-section" id="config-section"></div>
+</div>
+
+<script>
+const API = window.location.origin;
+
+async function fetchJSON(url) {
+  const r = await fetch(url);
+  if (!r.ok) throw new Error(`${r.status} ${r.statusText}`);
+  return r.json();
+}
+
+function formatTime(iso) {
+  if (!iso) return "—";
+  const d = new Date(iso);
+  return d.toLocaleString();
+}
+
+function render() {
+  Promise.all([
+    fetchJSON(`${API}/api/peers`),
+    fetchJSON(`${API}/api/summary`),
+    fetchJSON(`${API}/api/config`),
+  ]).then(([peers, summary, config]) => {
+    // Summary bar
+    document.getElementById("summary").innerHTML = `
+      <div class="stat">
+        <div class="num num-green">${summary.connected_peers}</div>
+        <div class="lbl">Connected</div>
+      </div>
+      <div class="stat">
+        <div class="num num-blue">${summary.total_peers}</div>
+        <div class="lbl">Total Peers</div>
+      </div>
+      <div class="stat">
+        <div class="num num-yellow">${summary.total_connections_recorded}</div>
+        <div class="lbl">Total Connections</div>
+      </div>
+      <div class="stat">
+        <div class="num">${config.server_port || "—"}</div>
+        <div class="lbl">Listen Port</div>
+      </div>
+    `;
+
+    // Peer cards
+    const peersEl = document.getElementById("peers-list");
+    peersEl.innerHTML = peers.map((p, i) => {
+      const hs = p.handshake;
+      const dotCls = p.connected ? "dot-up" : (hs.seconds_ago === null ? "dot-never" : "dot-down");
+      const agoStr = p.connected ? "Connected" : (hs.label || "Never");
+      return `
+        <div class="card">
+          <div class="card-header" onclick="toggleCard(${i})">
+            <div class="left">
+              <span class="dot ${dotCls}"></span>
+              <strong>${p.name}</strong>
+              <span style="color:var(--muted);font-size:0.8rem;font-family:monospace">${p.allowed_ips}</span>
+            </div>
+            <div class="right">
+              <span>${agoStr}</span>
+              <span>${p.total_connections}×</span>
+              <span class="arrow" id="arrow-${i}">&#x25B6;</span>
+            </div>
+          </div>
+          <div class="card-body" id="body-${i}">
+            <div class="info-grid">
+              <div><div class="label">Endpoint</div><div class="value">${p.endpoint}</div></div>
+              <div><div class="label">Public Key</div><div class="value" style="font-size:0.75rem">${p.public_key}</div></div>
+              <div><div class="label">Last Handshake</div><div class="value">${hs.label || "Never"}${hs.timestamp ? ' · ' + formatTime(hs.timestamp) : ''}</div></div>
+              <div><div class="label">Total Connections</div><div class="value">${p.total_connections}</div></div>
+              <div><div class="label">Data Received</div><div class="value">${p.transfer_rx}</div></div>
+              <div><div class="label">Data Sent</div><div class="value">${p.transfer_tx}</div></div>
+            </div>
+            <div id="history-${i}">
+              <div style="color:var(--muted);font-size:0.75rem;margin-bottom:4px">Recent connections</div>
+              <div style="font-size:0.8rem;color:var(--muted)">Loading...</div>
+            </div>
+          </div>
+        </div>
+      `;
+    }).join("");
+
+    // Load history for each peer
+    peers.forEach((p, i) => {
+      const pk = p.public_key;
+      fetchJSON(`${API}/api/peers/${encodeURIComponent(pk)}/history?limit=10`)
+        .then(hist => {
+          const el = document.getElementById(`history-${i}`);
+          if (!hist || hist.length === 0) {
+            el.innerHTML = '<div style="color:var(--muted);font-size:0.8rem">No connection history yet.</div>';
+            return;
+          }
+          let rows = hist.map(h => {
+            const ts = h.detected_at ? formatTime(h.detected_at) : "—";
+            const ip = h.endpoint_ip || "—";
+            return `<tr><td>${ts}</td><td>${ip}</td></tr>`;
+          }).join("");
+          el.innerHTML = `
+            <div style="color:var(--muted);font-size:0.75rem;margin-bottom:4px">Recent connections</div>
+            <table class="history-table">
+              <thead><tr><th>Detected</th><th>Source IP</th></tr></thead>
+              <tbody>${rows}</tbody>
+            </table>
+          `;
+        })
+        .catch(() => {
+          document.getElementById(`history-${i}`).innerHTML = '<div style="color:var(--muted);font-size:0.8rem">Failed to load history.</div>';
+        });
+    });
+
+    // Config section
+    const cfgEl = document.getElementById("config-section");
+    let peerRows = config.peers.map(p => `
+      <tr><td>${p.name}</td><td>${p.allowed_ips}</td><td>${p.public_key}</td><td>${p.endpoint_config}</td></tr>
+    `).join("");
+    cfgEl.innerHTML = `
+      <h2>Server Configuration</h2>
+      <div class="config-grid">
+        <div><div class="label">Interface</div><div class="value">${config.interface}</div></div>
+        <div><div class="label">Listen Port</div><div class="value">${config.server_port || "—"}</div></div>
+        <div><div class="label">Server IP</div><div class="value">${config.server_ip}</div></div>
+        <div><div class="label">Server Public Key</div><div class="value" style="font-size:0.75rem">${config.server_public_key || "—"}</div></div>
+        <div class="full"><div class="label">DNS</div><div class="value">${config.dns.length ? config.dns.join(", ") : "—"}</div></div>
+      </div>
+      <div class="peers-config" style="margin-top:12px">
+        <div style="color:var(--muted);font-size:0.75rem;margin-bottom:6px">Peer Configurations (obfuscated)</div>
+        <table>
+          <thead><tr><th>Name/IP</th><th>Allowed IPs</th><th>Public Key</th><th>Endpoint</th></tr></thead>
+          <tbody>${peerRows || '<tr><td colspan="4" style="color:var(--muted);text-align:center">No peers configured</td></tr>'}</tbody>
+        </table>
+      </div>
+    `;
+  }).catch(err => {
+    document.getElementById("peers-list").innerHTML = `<div class="error">Failed to load: ${err.message}</div>`;
+  });
+}
+
+function toggleCard(i) {
+  const body = document.getElementById(`body-${i}`);
+  const arrow = document.getElementById(`arrow-${i}`);
+  body.classList.toggle("open");
+  arrow.classList.toggle("open");
+}
+
+render();
+setInterval(render, 15000);
+</script>
+</body>
+</html>

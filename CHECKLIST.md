@@ -143,6 +143,20 @@
 - [x] Added a "Naming note" callout to `README.md` clarifying that *paths* (e.g., `/opt/WG_UFW-Server`, the `wg_ufw_manager.py` module) **were intentionally NOT renamed** — those are deferred to avoid disturbing the live deployment
 - [x] Renamed local clone directory `/mnt/jbaez_data/Scripts-linux/WG_UFW-Server` → `WG-home-VPN`; updated the path reference in `CLAUDE.md` "Resuming Work" and in memory `project_wg_ufw.md`
 
+## Session: 2026-07-08 — Status API + Interactive Dashboard
+
+### Completed
+- [x] Created `api/main.py` — FastAPI app with peer status, connection history, config endpoints
+- [x] Created `api/db.py` — SQLite connection tracking with background poller (30s interval)
+- [x] Created `api/templates/dashboard.html` — Interactive web dashboard (auto-refreshes every 15s)
+- [x] Created `api/wg-api.service` — systemd unit for the API on V10L3T4
+- [x] Created `scripts/deploy-api.sh` — Deploy API to remote, install service
+- [x] Updated `requirements.txt` with FastAPI + uvicorn
+- [x] Endpoints: `GET /` (dashboard), `GET /api/peers`, `GET /api/peers/{key}/history`, `GET /api/config`, `GET /api/summary`
+- [x] Connection tracking: logs handshake changes to SQLite, counts total connections per peer
+- [x] Security: keys obfuscated (prefix + suffix only), endpoints masked, private data never exposed
+- [x] Updated ai-rnd-01 dashboard at port 8081 with link to the new API
+
 ### Still deferred
 - [ ] Remote deployed path `/opt/WG_UFW-Server` on V10L3T4 (requires coordinated SSH `mv` on the remote + updating `scripts/deploy.sh` `REMOTE_PATH` + redeploy)
 - [ ] Python module / CLI file name `wg_ufw_manager.py` (renaming changes the entry-point and any scripts/aliases that call it)

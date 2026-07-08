@@ -1,0 +1,16 @@
+[Unit]
+Description=WG-home-VPN Status API
+After=network.target wg-quick@wg0.service
+Wants=wg-quick@wg0.service
+
+[Service]
+Type=simple
+User=observa
+WorkingDirectory=/opt/WG_UFW-Server
+ExecStart=/opt/WG_UFW-Server/.venv/bin/uvicorn api.main:app --host 0.0.0.0 --port 8800
+Restart=always
+RestartSec=5
+EnvironmentFile=/opt/WG_UFW-Server/.env
+
+[Install]
+WantedBy=multi-user.target
